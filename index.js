@@ -1,5 +1,10 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
+
+app.use(bodyparser.urlencoded({ extended: true }))
+app.use(bodyparser.json())
+
 app.all('/', (req, res) => {
     console.log("Just got a request!")
     res.send('Yo!')
