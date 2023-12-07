@@ -9,4 +9,9 @@ app.post('/whatsapp', (req, res) => {
     res.send('Whatsapp!')
 });
 
+app.post('/webhook/customer-created', (req, res) => {
+    console.log("BODY:", req.body);
+    res.sendStatus(200);
+});
+
 app.listen(process.env.PORT || 3000)
