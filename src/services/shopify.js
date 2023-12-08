@@ -9,19 +9,24 @@ const SHOP = process.env.SHOPIFY_SHOP_NAME;
 const BASE_URL = `https://${SHOP}.myshopify.com/admin/api/2023-04`;
 
 const updateCustomerPhone = async (customer) => {
+    let phone = `+${customer.note}`;
     let data = {
         "customer": {
-            "phone": `+${customer.note}`
+            "phone": phone
         }
     };
-    let config = {
-        method: 'put',
-        url: `${BASE_URL}/customers/${customer.id}.json`,
-        headers: headers,
-        data: data
-    };
+    const { data: body } = await axios.put(
+        `${BASE_URL}/customers/${customer.id}.json`, data,
+        {
+            headers
+        }
+    ).then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log(err);
+    });
 
-    return await axios.request(config);
+    return body;
 }
 
 
