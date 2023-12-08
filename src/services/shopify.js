@@ -5,7 +5,10 @@ const headers = {
     'Content-Type': 'application/json'
 };
 
-export const updateCustomerPhone = async (customer) => {
+const SHOP = process.env.SHOPIFY_SHOP_NAME;
+const BASE_URL = `https://${SHOP}.myshopify.com/admin/api/2023-04`;
+
+const updateCustomerPhone = async (customer) => {
     let data = {
         "customer": {
             "phone": `+${customer.note}`
@@ -13,7 +16,7 @@ export const updateCustomerPhone = async (customer) => {
     };
     let config = {
         method: 'put',
-        url: `https://${process.env.SHOPIFY_SHOP_NAME}.myshopify.com/admin/api/2023-04/customers/${customer.id}.json`,
+        url: `${BASE_URL}/customers/${customer.id}.json`,
         headers: headers,
         data: data
     };
@@ -22,14 +25,13 @@ export const updateCustomerPhone = async (customer) => {
 }
 
 
-export const cancelOrder = async (order_id) => {
-
-    return await axios.post(`https://${process.env.SHOPIFY_SHOP_NAME}.myshopify.com/admin/api/2023-04/orders/${order_id}/cancel.json`, {}, {
+const cancelOrder = async (order_id) => {
+    return await axios.post(`${BASE_URL}/orders/${order_id}/cancel.json`, {}, {
         headers: headers
     })
 }
 
-export const getCustomerByPhone = async (phone) => {
+const getCustomerByPhone = async (phone) => {
     let trimmedPhone = (phone).replace(/\s/g, "");
     trimmedPhone = trimmedPhone.replace("+", "");
 
@@ -39,6 +41,8 @@ export const getCustomerByPhone = async (phone) => {
             query: `phone:"+${trimmedPhone}"`
         },
     }
-    const { data: response } = await axios.get(`https://${process.env.SHOPIFY_SHOP_NAME}.myshopify.com/admin/api/2023-04/customers/search.json`, config);
-    return response
+    const { data: response } = await axios.get(`${BASE_URL}/customers/search.json`, config);
+    return response;
 }
+
+module.exports = { updateCustomerPhone, getCustomerByPhone, cancelOrder }
