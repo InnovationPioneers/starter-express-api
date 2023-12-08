@@ -14,6 +14,7 @@ app.all('/', (req, res) => {
 });
 
 app.post('/whatsapp', async (req, res) => {
+    console.log("Whatsapp Request", req);
     const token = req.headers.authorization.split(' ')[1];
     if (token != process.env.WHATSAPP_BEARER_TOKEN) {
         res.status(403).json({ error: 'Unauthorized Credentials!' });
