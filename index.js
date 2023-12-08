@@ -33,6 +33,9 @@ app.post('/whatsapp', async (req, res) => {
 
 app.post('/webhook/customer-created', async (req, res) => {
     const customer = req.body;
+    if (!customer.note) {
+        return res.sendStatus(204);
+    }
     const result = await updateCustomerPhone(customer);
     if (!result) {
         return res.sendStatus(204);
