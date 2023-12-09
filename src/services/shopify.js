@@ -15,7 +15,7 @@ const updateCustomerPhone = async (customer) => {
             "phone": phone
         }
     };
-    const { data: body } = await axios.put(
+    const result = await axios.put(
         `${BASE_URL}/customers/${customer.id}.json`, data,
         {
             headers
@@ -26,7 +26,7 @@ const updateCustomerPhone = async (customer) => {
         console.log(err);
     });
 
-    return body;
+    return result;
 }
 
 
