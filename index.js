@@ -32,7 +32,16 @@ app.get("/order-status/:id", async (req, res) => {
     try {
         const result = await getOrderById(req.params.id);
         console.log("order result", result);
-        return res.json(result);
+
+        if (!result) {
+            return res.sendStatus(204);
+        }
+        const status = result.cancelled_at ? "Cancelled" : ((result.closed_at ? "Closed": "Open"));
+        return res.json({
+            id: result.id,
+            status: status,
+            customer: result.customer
+        });
     } catch (error) {
         console.log("error while fetching order", error);
     }
