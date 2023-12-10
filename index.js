@@ -7,6 +7,7 @@ const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(bodyParser.text())
 
 app.all('/', (req, res) => {
     console.log("Just got a request!")
@@ -14,7 +15,7 @@ app.all('/', (req, res) => {
 });
 
 app.post('/whatsapp', async (req, res) => {
-    console.log("Whatsapp Request", req);
+    console.log("Whatsapp Request", req.body);
     if (!req.headers?.authorization) {
         res.status(401).json({ error: 'Unauthorized Credentials!' });
         return;
@@ -24,7 +25,8 @@ app.post('/whatsapp', async (req, res) => {
         res.status(403).json({ error: 'Unauthorized Credentials!' });
         return;
     }
-    const body = JSON.parse(req.body);
+    let newBody = req.body.replace(/\\"/g, '"');
+    const body = JSON.parse(newBody);
     console.log("body", body);
     try {
         const result = await getCustomerByPhone(body.from);
