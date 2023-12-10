@@ -31,9 +31,13 @@ const updateCustomerPhone = async (customer) => {
 
 
 const cancelOrder = async (order_id) => {
-    return await axios.post(`${BASE_URL}/orders/${order_id}/cancel.json`, {}, {
-        headers: headers
-    })
+    try {
+        return await axios.post(`${BASE_URL}/orders/${order_id}/cancel.json`, {}, {
+            headers: headers
+        })
+    } catch (error) {
+        console.log(`failed to cancel order ${order_id}`, error);   
+    }
 }
 
 const getCustomerByPhone = async (phone) => {

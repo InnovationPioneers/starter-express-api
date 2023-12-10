@@ -25,12 +25,17 @@ app.post('/whatsapp', async (req, res) => {
         return;
     }
     let body = req.body;
-    const result = await getCustomerByPhone(body.from);
-    if (result?.customers?.length > 0) {
-        let customer = result.customers[0];
-        if (body.text == "2") {
-            await cancelOrder(customer.last_order_id);
+    try {
+        const result = await getCustomerByPhone(body.from);
+        console.log("customers result", result);
+        if (result?.customers?.length > 0) {
+            let customer = result.customers[0];
+            if (body.text == "2") {
+                await cancelOrder(customer.last_order_id);
+            }
         }
+    } catch (error) {
+        console.log("error", error);
     }
     res.sendStatus(200);
 });
