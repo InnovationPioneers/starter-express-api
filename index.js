@@ -33,7 +33,7 @@ app.post('/whatsapp', async (req, res) => {
         console.log("customers result", result);
         if (result?.customers?.length > 0) {
             let customer = result.customers[0];
-            if (body.text == "2") {
+            if (body?.text == "2" || body?.reply == "2") {
                 await cancelOrder(customer.last_order_id);
             }
         }
