@@ -8,15 +8,14 @@ const headers = {
 const SHOP = process.env.SHOPIFY_SHOP_NAME;
 const BASE_URL = `https://${SHOP}.myshopify.com/admin/api/2023-04`;
 
-const updateCustomerPhone = async (customer) => {
-    let phone = `+${customer.note}`;
+const updateCustomerPhone = async (id, phone) => {
     let data = {
         "customer": {
             "phone": phone
         }
     };
     const result = await axios.put(
-        `${BASE_URL}/customers/${customer.id}.json`, data,
+        `${BASE_URL}/customers/${id}.json`, data,
         {
             headers
         }

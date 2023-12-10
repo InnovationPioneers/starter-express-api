@@ -77,12 +77,42 @@ app.post('/whatsapp', async (req, res) => {
     res.sendStatus(200);
 });
 
+
+app.post('/customer-update', async (req, res) => {
+    if (!req.headers?.authorization) {
+        res.status(401).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
+    const token = req.headers.authorization.split(' ')[1];
+    if (token != process.env.WHATSAPP_BEARER_TOKEN) {
+        res.status(403).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
+    try {
+        const body = req.body;
+        if (!body.phone) {
+            res.status(400).json({
+                status: "failed",
+                error: "phone number not provided"
+            });
+        }
+        await updateCustomerPhone(body.id, body.phone);
+    } catch (error) {
+        console.log("error", error);
+        res.status(400).json({
+            status: "failed",
+            error: error
+        });
+    }
+    res.sendStatus(200);
+});
+
 app.post('/webhook/customer-created', async (req, res) => {
     const customer = req.body;
     if (!customer.note) {
         return res.sendStatus(204);
     }
-    const result = await updateCustomerPhone(customer);
+    const result = await updateCustomerPhone(customer.id, `+${customer.note}`);
     if (!result) {
         return res.sendStatus(204);
     }
