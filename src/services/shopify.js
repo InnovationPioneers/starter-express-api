@@ -48,10 +48,21 @@ const getCustomerByPhone = async (phone) => {
         headers: headers,
         params: {
             query: `phone:"+${trimmedPhone}"`
-        },
+        }
     }
     const { data: response } = await axios.get(`${BASE_URL}/customers/search.json`, config);
     return response;
 }
 
-module.exports = { updateCustomerPhone, getCustomerByPhone, cancelOrder }
+const getOrderById = async (order_id) => {
+    let config = {
+        headers: headers,
+        params: {
+            fields: "financial_status,closed_at,cancelled_at,customer,fulfillment_status"
+        }
+    }
+    const { data: response } = await axios.get(`${BASE_URL}/orders/${order_id}.json`, config);
+    return response;
+}
+
+module.exports = { getOrderById, updateCustomerPhone, getCustomerByPhone, cancelOrder }

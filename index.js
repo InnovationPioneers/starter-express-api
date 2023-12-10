@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const axios = require('axios')
-const { updateCustomerPhone, getCustomerByPhone, cancelOrder } = require('./src/services/shopify')
+const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById } = require('./src/services/shopify')
 
 const app = express()
 
@@ -12,6 +12,31 @@ app.use(bodyParser.text())
 app.all('/', (req, res) => {
     console.log("Just got a request!")
     res.send('Yo!')
+});
+
+
+app.get("/order-status/:id", async (req, res) => {
+    if (!req.headers?.authorization) {
+        res.status(401).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
+    const token = req.headers.authorization.split(' ')[1];
+    if (token != process.env.WHATSAPP_BEARER_TOKEN) {
+        res.status(403).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
+    if (!req.params?.id) {
+        res.status(400).json({ error: 'Missing order id!' });
+        return;
+    }
+    try {
+        const result = await getOrderById(req.params.id);
+        console.log("order result", result);
+        return res.json(result);
+    } catch (error) {
+        console.log("error while fetching order", error);
+    }
+    res.sendStatus(200);
 });
 
 app.post('/whatsapp', async (req, res) => {
