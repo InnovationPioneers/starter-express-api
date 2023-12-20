@@ -35,7 +35,7 @@ const cancelOrder = async (order_id) => {
             headers: headers
         })
     } catch (error) {
-        console.log(`failed to cancel order ${order_id}`, error);   
+        console.log(`failed to cancel order ${order_id}`, error);
     }
 }
 
@@ -64,4 +64,29 @@ const getOrderById = async (order_id) => {
     return response;
 }
 
-module.exports = { getOrderById, updateCustomerPhone, getCustomerByPhone, cancelOrder }
+const getAbandonedCheckouts = async () => {
+    const minDate = getTodayDate();
+    let config = {
+        headers: headers,
+        params: {
+            created_at_min: minDate,
+            limit: 250
+        }
+    }
+    const { data: response } = await axios.get(`${BASE_URL}/checkouts.json?created_at_min=2023-12-17&limit=250`, config);
+    return response?.checkouts;
+}
+
+const getTodayDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = today.getMonth() + 1; // Months start at 0!
+    const dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+module.exports = { getOrderById, updateCustomerPhone, getCustomerByPhone, cancelOrder, getAbandonedCheckouts }

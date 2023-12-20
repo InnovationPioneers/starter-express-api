@@ -1,7 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const axios = require('axios')
-const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById } = require('./src/services/shopify')
+const axios = require('axios');
+const cron = require("node-cron");
+const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById, getAbandonedCheckouts } = require('./src/services/shopify')
+const { sendSavedCartMessage } = require('./src/utils/taqnyat');
 
 const app = express()
 
@@ -36,7 +38,7 @@ app.get("/order-status/:id", async (req, res) => {
         if (!result || !result?.order) {
             return res.sendStatus(204);
         }
-        const status = result.order.cancelled_at ? "Cancelled" : ((result.order.closed_at ? "Closed": "Open"));
+        const status = result.order.cancelled_at ? "Cancelled" : ((result.order.closed_at ? "Closed" : "Open"));
         return res.json({
             id: result.order.id,
             status: status,
@@ -61,7 +63,6 @@ app.post('/whatsapp', async (req, res) => {
     }
     let newBody = req.body.replace(/\\"/g, '"');
     const body = JSON.parse(newBody);
-    console.log("body", body);
     try {
         const result = await getCustomerByPhone(body.from);
         console.log("customers result", result);
@@ -117,6 +118,20 @@ app.post('/webhook/customer-created', async (req, res) => {
         return res.sendStatus(204);
     }
     res.sendStatus(200);
+});
+
+cron.schedule(" * */2 * * * *", () => {
+    console.log("A cron job that runs every 2 minutes");
+});
+
+cron.schedule(" 0 0 0 * * *", async () => {
+    console.log("A cron job that runs every midnight");
+    const checkouts = await getAbandonedCheckouts();
+    checkouts.forEach(async (cart) => {
+        const phone = cart.customer.phone ?? cart.customer.note;
+        if (!phone) return;
+        await sendSavedCartMessage(phone, cart);
+    });
 });
 
 app.listen(process.env.PORT || 3000)
