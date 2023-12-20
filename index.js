@@ -13,7 +13,7 @@ app.use(bodyParser.text())
 
 app.all('/', (req, res) => {
     console.log("Just got a request!")
-    res.send('Yo!')
+    res.send('Hi Smile Custom APP!')
 });
 
 
