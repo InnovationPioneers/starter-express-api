@@ -7,6 +7,7 @@ const headers = {
 };
 const sendSavedCartMessage = async (phone, cart) => {
     try {
+        console.log("sending whatsapp message to ", phone);
         await axios.post(`${BASE_URL}`, {
             "to": phone.replace(" ", "").replace("+", ""),
             "type": "template",

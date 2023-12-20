@@ -120,18 +120,28 @@ app.post('/webhook/customer-created', async (req, res) => {
     res.sendStatus(200);
 });
 
-cron.schedule(" * */2 * * * *", () => {
-    console.log("A cron job that runs every 2 minutes");
-});
-
-cron.schedule(" 0 0 0 * * *", async () => {
-    console.log("A cron job that runs every midnight");
+app.post('/notify-abandoned-checkouts', async (req, res) => {
+    console.log("notify abandoned carts");
+    if (!req.headers['X-SECRET-KEY']) {
+        res.status(401).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
+    if (req.headers['X-SECRET-KEY'] != "fybnqmf") {
+        res.status(401).json({ error: 'Unauthorized Credentials!' });
+        return;
+    }
     const checkouts = await getAbandonedCheckouts();
     checkouts.forEach(async (cart) => {
         const phone = cart.customer.phone ?? cart.customer.note;
         if (!phone) return;
         await sendSavedCartMessage(phone, cart);
     });
+    return res.sendStatus(200);
 });
+
+cron.schedule(" * */2 * * * *", () => {
+    console.log("A cron job that runs every 2 minutes");
+});
+
 
 app.listen(process.env.PORT || 3000)
