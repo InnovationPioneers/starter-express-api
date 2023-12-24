@@ -61,8 +61,8 @@ app.post('/whatsapp', async (req, res) => {
     //     res.status(403).json({ error: 'Unauthorized Credentials!' });
     //     return;
     // }
-    let newBody = req.body.replace(/\\"/g, '"');
-    const body = JSON.parse(newBody);
+    // let newBody = req.body.replace(/\\"/g, '"');
+    const body = JSON.parse(req.body);
     try {
         const result = await getCustomerByPhone(body.from);
         console.log("customers result", result);
