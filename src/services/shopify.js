@@ -32,7 +32,8 @@ const updateCustomerPhone = async (id, phone) => {
 const cancelOrder = async (order_id) => {
     try {
         return await axios.post(`${BASE_URL}/orders/${order_id}/cancel.json`, {
-            email: true
+            email: true,
+            reason: "customer"
         }, {
             headers: headers
         })
