@@ -62,7 +62,7 @@ app.post('/whatsapp', async (req, res) => {
     //     return;
     // }
     // let newBody = req.body.replace(/\\"/g, '"');
-    const body = JSON.parse(req.body);
+    const body = req.body;
     try {
         const result = await getCustomerByPhone(body.from);
         console.log("customers result", result);
