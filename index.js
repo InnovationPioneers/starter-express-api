@@ -52,15 +52,15 @@ app.get("/order-status/:id", async (req, res) => {
 
 app.post('/whatsapp', async (req, res) => {
     console.log("Whatsapp Request", req.body);
-    if (!req.headers?.authorization) {
-        res.status(401).json({ error: 'Unauthorized Credentials!' });
-        return;
-    }
-    const token = req.headers.authorization.split(' ')[1];
-    if (token != process.env.WHATSAPP_BEARER_TOKEN) {
-        res.status(403).json({ error: 'Unauthorized Credentials!' });
-        return;
-    }
+    // if (!req.headers?.authorization) {
+    //     res.status(401).json({ error: 'Unauthorized Credentials!' });
+    //     return;
+    // }
+    // const token = req.headers.authorization.split(' ')[1];
+    // if (token != process.env.WHATSAPP_BEARER_TOKEN) {
+    //     res.status(403).json({ error: 'Unauthorized Credentials!' });
+    //     return;
+    // }
     let newBody = req.body.replace(/\\"/g, '"');
     const body = JSON.parse(newBody);
     try {
@@ -68,11 +68,15 @@ app.post('/whatsapp', async (req, res) => {
         console.log("customers result", result);
         if (result?.customers?.length > 0) {
             let customer = result.customers[0];
+            console.log("Cancellation Request with text", body?.reply ?? body?.text ?? "");
             if (body?.text == "2" || body?.reply == "2") {
+                console.log("Cancellation Request Valid");
                 await cancelOrder(customer.last_order_id);
+                console.log("Cancellation Request Done");
             }
         }
     } catch (error) {
+        console.log("Cancellation Request Error", error);
         console.log("error", error);
     }
     res.sendStatus(200);
@@ -121,15 +125,15 @@ app.post('/webhook/customer-created', async (req, res) => {
 });
 
 app.post('/notify-abandoned-checkouts', async (req, res) => {
-    console.log("notify abandoned carts");
-    if (!req.headers['X-SECRET-KEY']) {
-        res.status(401).json({ error: 'Unauthorized Credentials!' });
-        return;
-    }
-    if (req.headers['X-SECRET-KEY'] != "fybnqmf") {
-        res.status(401).json({ error: 'Unauthorized Credentials!' });
-        return;
-    }
+    // console.log("notify abandoned carts");
+    // if (!req.headers['X-SECRET-KEY']) {
+    //     res.status(401).json({ error: 'Unauthorized Credentials!' });
+    //     return;
+    // }
+    // if (req.headers['X-SECRET-KEY'] != "fybnqmf") {
+    //     res.status(401).json({ error: 'Unauthorized Credentials!' });
+    //     return;
+    // }
     const checkouts = await getAbandonedCheckouts();
     checkouts.forEach(async (cart) => {
         const phone = cart.customer.phone ?? cart.customer.note;
