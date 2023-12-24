@@ -46,7 +46,8 @@ const getCustomerByPhone = async (phone) => {
     let config = {
         headers: headers,
         params: {
-            query: `phone:"+${trimmedPhone}"`
+            query: `phone:"+${trimmedPhone}"`,
+            fields: "last_order_id,id,phone,email"
         }
     }
     const { data: response } = await axios.get(`${BASE_URL}/customers/search.json`, config);

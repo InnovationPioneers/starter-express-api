@@ -69,7 +69,7 @@ app.post('/whatsapp', async (req, res) => {
         if (result?.customers?.length > 0) {
             let customer = result.customers[0];
             console.log("Cancellation Request with text", body?.reply ?? body?.text ?? "");
-            if (body?.text == "2" || body?.reply == "2" || body?.reply == "إلغاء" || body?.text == "إلغاء") {
+            if (body?.text == "2" || body?.reply == "2" || body?.reply == "الغاء" || body?.text == "الغاء" || body?.reson == "الغاء") {
                 console.log("Cancellation Request Valid");
                 await cancelOrder(customer.last_order_id);
                 console.log("Cancellation Request Done");
