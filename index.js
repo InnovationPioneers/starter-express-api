@@ -68,7 +68,10 @@ app.post('/whatsapp', async (req, res) => {
         if (result?.customers?.length > 0) {
             let customer = result.customers[0];
             console.log("Cancellation Request with text", body?.reply ?? body?.text ?? "");
-            if (body?.text == "2" || body?.reply == "2" || body?.reply == "الغاء" || body?.text == "الغاء" || body?.reson == "الغاء") {
+            if (body?.text == "2" || body?.reply == "2" || body?.reply == "الغاء" ||
+                body?.text == "الغاء" || body?.reson == "الغاء" ||
+                body?.reply?.toLowerCase() == "cancel" ||
+                body?.text?.toLowerCase() == "cancel" || body?.reson?.toLowerCase() == "cancel") {
                 await cancelOrder(customer.last_order_id);
             }
         }
