@@ -10,6 +10,7 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.text())
+app.use(express.static('public'))
 
 app.all('/', (req, res) => {
     console.log("Just got a request!")
