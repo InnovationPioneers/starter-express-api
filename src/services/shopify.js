@@ -76,15 +76,15 @@ const getAbandonedCheckouts = async () => {
             limit: 250
         }
     }
-    const { data: response } = await axios.get(`${BASE_URL}/checkouts.json?created_at_min=2023-12-17&limit=250`, config);
+    const { data: response } = await axios.get(`${BASE_URL}/checkouts.json`, config);
     return response?.checkouts;
 }
 
 const getTodayDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = today.getMonth() + 1; // Months start at 0!
-    const dd = today.getDate();
+    let mm = today.getMonth() + 1; // Months start at 0!
+    let dd = today.getDate();
 
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;

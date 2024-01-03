@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const axios = require('axios');
 const cron = require("node-cron");
 const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById, getAbandonedCheckouts } = require('./src/services/shopify')
-const { sendSavedCartMessage } = require('./src/utils/taqnyat');
+const { sendSavedCartMessage, mapPhoneNumber } = require('./src/utils/taqnyat');
 
 const app = express()
 
@@ -126,27 +126,20 @@ app.post('/webhook/customer-created', async (req, res) => {
 });
 
 app.post('/notify-abandoned-checkouts', async (req, res) => {
-    // console.log("notify abandoned carts");
-    // if (!req.headers['X-SECRET-KEY']) {
-    //     res.status(401).json({ error: 'Unauthorized Credentials!' });
-    //     return;
-    // }
-    // if (req.headers['X-SECRET-KEY'] != "fybnqmf") {
-    //     res.status(401).json({ error: 'Unauthorized Credentials!' });
-    //     return;
-    // }
     const checkouts = await getAbandonedCheckouts();
+    let promises = [];
     checkouts.forEach(async (cart) => {
-        const phone = cart.customer.phone ?? cart.customer.note;
+        const { shipping_address, billing_address, customer_locale, customer, abandoned_checkout_url } = cart;
+        const address = shipping_address ?? billing_address;
+        const country_code = address.country_code;
+        const phone = customer.phone ?? customer.note ?? mapPhoneNumber(address.phone, country_code);
         if (!phone) return;
-        await sendSavedCartMessage(phone, cart);
+
+        promises.push(sendSavedCartMessage(phone, abandoned_checkout_url, customer_locale));
     });
+
+    const result = await Promise.allSettled(promises);
     return res.sendStatus(200);
 });
-
-cron.schedule(" * */2 * * * *", () => {
-    console.log("A cron job that runs every 2 minutes");
-});
-
 
 app.listen(process.env.PORT || 3000)
