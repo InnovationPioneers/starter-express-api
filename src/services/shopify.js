@@ -67,6 +67,24 @@ const getOrderById = async (order_id) => {
     return response;
 }
 
+const getCustomerCODOrders = async (customer) => {
+    let date = getYesterdayDate();
+    let config = {
+        headers: headers,
+        params: {
+            status: "open",
+            created_at_min: date,
+            fields: "id,payment_gateway_names,created_at"
+        }
+    }
+    const { data: response } = await axios.get(`${BASE_URL}/customers/${customer.id}/orders.json`, config);
+    const order = response.orders.find((order) => {
+        return order.payment_gateway_names[0] == "Cash on Delivery (COD)"
+    });
+
+    return order;
+}
+
 const getAbandonedCheckouts = async () => {
     const minDate = getTodayDate();
     let config = {
@@ -92,4 +110,11 @@ const getTodayDate = () => {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-module.exports = { getOrderById, updateCustomerPhone, getCustomerByPhone, cancelOrder, getAbandonedCheckouts }
+const getYesterdayDate = () => {
+    let date = new Date();
+    const offset = date.getTimezoneOffset()
+    date = new Date(date.getTime() - (offset * 60 * 1000))
+    return date.toISOString().split('T')[0]
+}
+
+module.exports = { getOrderById, updateCustomerPhone, getCustomerByPhone, cancelOrder, getAbandonedCheckouts, getCustomerCODOrders }

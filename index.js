@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const axios = require('axios');
 const cron = require("node-cron");
-const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById, getAbandonedCheckouts } = require('./src/services/shopify')
+const { updateCustomerPhone, getCustomerByPhone, cancelOrder, getOrderById, getAbandonedCheckouts, getCustomerCODOrders } = require('./src/services/shopify')
 const { sendSavedCartMessage, mapPhoneNumber } = require('./src/utils/taqnyat');
 
 const app = express()
@@ -73,7 +73,9 @@ app.post('/whatsapp', async (req, res) => {
                 body?.text == "الغاء" || body?.reson == "الغاء" ||
                 body?.reply?.toLowerCase() == "cancel" ||
                 body?.text?.toLowerCase() == "cancel" || body?.reson?.toLowerCase() == "cancel") {
-                await cancelOrder(customer.last_order_id);
+                    const order = await getCustomerCODOrders(customer);
+                    if (order)
+                        await cancelOrder(order.id);
             }
         }
     } catch (error) {
