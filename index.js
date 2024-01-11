@@ -140,7 +140,7 @@ app.post('/notify-abandoned-checkouts', async (req, res) => {
         promises.push(sendSavedCartMessage(phone, abandoned_checkout_url, customer_locale));
     });
 
-    const result = await Promise.allSettled(promises).catch(error => {
+    await Promise.allSettled(promises).catch(error => {
         console.log("Failed to send saved cart message: ", error);
     });
     return res.sendStatus(200);
