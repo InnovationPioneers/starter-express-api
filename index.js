@@ -73,9 +73,9 @@ app.post('/whatsapp', async (req, res) => {
                 body?.text == "الغاء" || body?.reson == "الغاء" ||
                 body?.reply?.toLowerCase() == "cancel" ||
                 body?.text?.toLowerCase() == "cancel" || body?.reson?.toLowerCase() == "cancel") {
-                    const order = await getCustomerCODOrders(customer);
-                    if (order)
-                        await cancelOrder(order.id);
+                const order = await getCustomerCODOrders(customer);
+                if (order)
+                    await cancelOrder(order.id);
             }
         }
     } catch (error) {
@@ -128,6 +128,12 @@ app.post('/webhook/customer-created', async (req, res) => {
 });
 
 app.post('/notify-abandoned-checkouts', async (req, res) => {
+    const { skip } = req.query;
+
+    if (skip) {
+        console.log("Skipped");
+    }
+    
     const checkouts = await getAbandonedCheckouts();
     let promises = [];
     checkouts.forEach(async (cart) => {
@@ -140,9 +146,11 @@ app.post('/notify-abandoned-checkouts', async (req, res) => {
         promises.push(sendSavedCartMessage(phone, abandoned_checkout_url, customer_locale));
     });
 
-    await Promise.allSettled(promises).catch(error => {
-        console.log("Failed to send saved cart message: ", error);
-    });
+    if (!skip) {
+        await Promise.allSettled(promises).catch(error => {
+            console.log("Failed to send saved cart message: ", error);
+        });
+    }
     return res.sendStatus(200);
 });
 
