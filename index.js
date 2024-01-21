@@ -128,30 +128,35 @@ app.post('/webhook/customer-created', async (req, res) => {
 });
 
 app.post('/notify-abandoned-checkouts', async (req, res) => {
+    res.sendStatus(200);
+
     const { skip } = req.query;
 
-    if (skip) {
-        console.log("Skipped");
-    }
+    try {
+        if (skip) {
+            console.log("Skipped");
+        }
+        
+        const checkouts = await getAbandonedCheckouts();
+        let promises = [];
+        checkouts.forEach(async (cart) => {
+            const { shipping_address, billing_address, customer_locale, customer, abandoned_checkout_url } = cart;
+            const address = shipping_address ?? billing_address;
+            const country_code = address.country_code;
+            const phone = customer.phone ?? customer.note ?? mapPhoneNumber(address.phone, country_code);
+            if (!phone) return;
     
-    const checkouts = await getAbandonedCheckouts();
-    let promises = [];
-    checkouts.forEach(async (cart) => {
-        const { shipping_address, billing_address, customer_locale, customer, abandoned_checkout_url } = cart;
-        const address = shipping_address ?? billing_address;
-        const country_code = address.country_code;
-        const phone = customer.phone ?? customer.note ?? mapPhoneNumber(address.phone, country_code);
-        if (!phone) return;
-
-        promises.push(sendSavedCartMessage(phone, abandoned_checkout_url, customer_locale));
-    });
-
-    if (!skip) {
-        await Promise.allSettled(promises).catch(error => {
-            console.log("Failed to send saved cart message: ", error);
+            promises.push(sendSavedCartMessage(phone, abandoned_checkout_url, customer_locale));
         });
+    
+        if (!skip) {
+            await Promise.allSettled(promises).catch(error => {
+                console.log("Failed to send saved cart message: ", error);
+            });
+        }
+    } catch (error) {
+        console.log("error saved carts", error);
     }
-    return res.sendStatus(200);
 });
 
 app.listen(process.env.PORT || 3000)
